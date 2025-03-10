@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador OSINT</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>OSINT e Cibersegurança</h1>
+        <p>Insira um número de telefone para buscar informações públicas:</p>
+        <input type="text" id="phone" placeholder="Digite o número...">
+        <button onclick="buscarDados()">CUIDADO</button>
+        <div id="resultado"></div>
+        <div id="map" style="width: 100%; height: 300px; margin-top: 20px; display: none;"></div>
+    </div>
+
+    <script>
+        function buscarDados() {
+            let numero = document.getElementById('phone').value;
+            let resultado = document.getElementById('resultado');
+            let mapa = document.getElementById('map');
+            
+            if (numero === '') {
+                resultado.innerHTML = '<p style="color: red;">Por favor, insira um número válido.</p>';
+                return;
+            }
+            
+            resultado.innerHTML = '<p>Buscando informações...</p>';
+            mapa.style.display = "none";
+            
+            setTimeout(() => {
+                let dadosFicticios = {
+                    "(61) 99999-0000": { nome: "João Silva", cidade: "Brasília", operadora: "Vivo", email: "joao.silva@email.com", latitude: -15.7801, longitude: -47.9292 },
+                    "(11) 98888-1111": { nome: "Maria Souza", cidade: "São Paulo", operadora: "Claro", email: "maria.souza@email.com", latitude: -23.5505, longitude: -46.6333 },
+                    "94 991493972": { nome: "Joshemit Mendoza", cidade: "Águas Lindas de Goiás", idade: "20 anos", email: "joshemit.mendoza@email.com", latitude: -15.7611, longitude: -48.2817 }
+                };
+                
+                if (dadosFicticios[numero]) {
+                    let info = dadosFicticios[numero];
+                    resultado.innerHTML = `<p><strong>Nome:</strong> ${info.nome}</p>
+                                          <p><strong>Cidade:</strong> ${info.cidade}</p>
+                                          ${info.operadora ? `<p><strong>Operadora:</strong> ${info.operadora}</p>` : ''}
+                                          ${info.idade ? `<p><strong>Idade:</strong> ${info.idade}</p>` : ''}
+                                          ${info.email ? `<p><strong>Email:</strong> ${info.email}</p>` : ''}`;
+                    
+                    if (info.latitude && info.longitude) {
+                        mapa.style.display = "block";
+                        exibirMapa(info.latitude, info.longitude);
+                    }
+                } else {
+                    resultado.innerHTML = '<p>Nenhuma informação pública encontrada para este número.</p>';
+                    mapa.style.display = "none";
+                }
+            }, 2000);
+        }
+
+        function exibirMapa(lat, lng) {
+            let map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: lat, lng: lng },
+                zoom: 12
+            });
+            new google.maps.Marker({
+                position: { lat: lat, lng: lng },
+                map: map,
+                title: "Localização aproximada"
+            });
+        }
+    </script>
+</body>
+</html>
